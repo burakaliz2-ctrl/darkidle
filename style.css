@@ -113,7 +113,7 @@ body.storm-mode .weather-overlay { background: rgba(0, 20, 40, 0.25); box-shadow
 .tab-btn.active { color: var(--neon-blue); border-bottom: 2px solid var(--neon-blue); background: rgba(56, 189, 248, 0.05); }
 
 .tab-content { padding: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; overflow-y: auto; align-content: start; }
-.action-card { background: #111827; border: 1px solid var(--border-color); padding: 20px; border-radius: 8px; cursor: pointer; color: white; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.action-card { background: #111827; border: 1px solid var(--border-color); padding: 20px; border-radius: 8px; cursor: pointer; color: white; display: flex; flex-direction: column; align-items: center; gap: 10px;transition: transform 0.1s ease, opacity 0.2s ease; }
 .action-card:hover { border-color: var(--neon-blue); transform: translateY(-2px); box-shadow: 0 0 10px rgba(56, 189, 248, 0.2); }
 
 /* YAPILAR ALANI DÜZENİ */
@@ -141,6 +141,9 @@ body.storm-mode .weather-overlay { background: rgba(0, 20, 40, 0.25); box-shadow
 
 /* --- SADECE MOBİL UYARLAMASI --- */
 /* Mevcut kodlarının altına olduğu gibi yapıştır */
+button, .btn {
+    transition: transform 0.1s, opacity 0.1s; /* Efektin akıcı olması için */
+}
 
 @media (max-width: 1024px) {
     body { 

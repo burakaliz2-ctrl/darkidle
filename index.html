@@ -73,12 +73,22 @@
                 </nav>
 
                 <div id="tab-actions" class="tab-content">
-                    <button class="action-card wood,btn btn-collect" onclick="game.collect('wood', 5)"><i class="fas fa-axe"></i> <span>Odun Kes (+5)</span></button>
-                    <button class="action-card food,btn btn-collect" onclick="game.collect('food', 5)"><i class="fas fa-search"></i> <span>Yiyecek Ara (+5)</span></button>
-                    <button class="action-card water,btn btn-collect" onclick="game.collect('water', 5)"><i class="fas fa-tint"></i> <span>Su Bul (+5)</span></button>
-                    <button class="action-card scrap,btn btn-collect" onclick="game.collect('scrap', 3)"><i class="fas fa-box-open"></i> <span>Hurda Topla (+3)</span></button>
-                </div>
-
+    <button class="action-card wood" onclick="game.collect('wood', 5, event, this)">
+        <i class="fas fa-axe"></i> <span>Odun Kes (+5)</span>
+    </button>
+    
+    <button class="action-card food" onclick="game.collect('food', 5, event, this)">
+        <i class="fas fa-search"></i> <span>Yiyecek Ara (+5)</span>
+    </button>
+    
+    <button class="action-card water" onclick="game.collect('water', 5, event, this)">
+        <i class="fas fa-tint"></i> <span>Su Bul (+5)</span>
+    </button>
+    
+    <button class="action-card scrap" onclick="game.collect('scrap', 3, event, this)">
+        <i class="fas fa-box-open"></i> <span>Hurda Topla (+3)</span>
+    </button>
+</div>
                 <div id="tab-structures" class="tab-content hidden">
                     <div class="build-box">
                         <div class="build-text"><strong>Oduncu Kampı [Lv <span id="lvl-wood">0</span>]</strong><small id="cost-wood">--</small></div>

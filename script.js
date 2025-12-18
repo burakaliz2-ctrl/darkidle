@@ -10,7 +10,12 @@ const game = {
     temp: 22,
     isNight: false,
     weather: "Açık",
-	isCollecting: false, // Tıklama spamını engellemek için kontrol
+	cooldowns: {
+        wood: false,
+        food: false,
+        water: false,
+        scrap: false
+    },
     init() {
         this.load();
         this.applyAtmosphere();
@@ -19,23 +24,38 @@ const game = {
         this.log("Sistem Aktif: v5.5 Savunma Hattı Hazır.");
     },
 
-    collect(type, amount) {
-		if (this.isCollecting) return;
-		this.isCollecting = true; // Kilidi kapat
+   collect(type, amount, event, element) {
+        // 1. Bu kaynağa özel kilidi kontrol et
+        if (this.cooldowns[type]) return;
+
+        // 2. Kilidi aktifleştir
+        this.cooldowns[type] = true;
+        
+        // 3. Kaynak ekleme ve UI güncelleme
         const bonusAmount = amount + (this.prestige * 2);
         this.res[type] += bonusAmount;
         this.log(`${bonusAmount} ${type} toplandı.`);
-        if (Math.random() < 0.15) this.triggerDiscovery();
         this.updateUI();
-		const buttons = document.querySelectorAll('.btn-collect');
-        buttons.forEach(btn => btn.style.opacity = "0.5");
-		// 800ms (0.8 saniye) sonra kilidi aç
-        setTimeout(() => {
-            this.isCollecting = false;
-            buttons.forEach(btn => btn.style.opacity = "1");
-        }, 800);
-    },
 
+        // 4. Görsel Efekt ve Tıklama Engelleme
+        if (element) {
+            element.style.opacity = "0.4";
+            element.style.transform = "scale(0.95)";
+            element.style.borderColor = "var(--neon-red)";
+            element.style.pointerEvents = "none"; // Bekleme süresinde tekrar basılmasın
+        }
+
+        // 5. 800ms sonra kilidi aç ve görseli sıfırla
+        setTimeout(() => {
+            this.cooldowns[type] = false;
+            if (element) {
+                element.style.opacity = "1";
+                element.style.transform = "scale(1)";
+                element.style.borderColor = "var(--border-color)";
+                element.style.pointerEvents = "auto"; // Tekrar basılabilir hale getir
+            }
+        }, 800); 
+    },
     triggerDiscovery() {
         const events = [
             { m: "Terk edilmiş bir çanta! (+1 Kit)", f: () => this.inv.medkit++ },
