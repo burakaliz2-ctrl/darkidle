@@ -70,8 +70,12 @@
                     <button class="tab-btn active" onclick="game.switchTab('actions', event)">EYLEMLER</button>
                     <button class="tab-btn" onclick="game.switchTab('structures', event)">YAPILAR</button>
                     <button class="tab-btn" onclick="game.switchTab('final', event)">KURTULUŞ</button>
+					<button class="tab-btn" onclick="game.switchTab('achievements', event)">BAŞARIMLAR</button>				
                 </nav>
-
+					<div id="tab-achievements" class="tab-content hidden">
+					<div class="achievement-grid" id="achievement-list">
+					</div>
+					</div>
                 <div id="tab-actions" class="tab-content">
     <button class="action-card wood" onclick="game.collect('wood', 5, event, this)">
         <i class="fas fa-axe"></i> <span>Odun Kes (+5)</span>
@@ -88,6 +92,7 @@
     <button class="action-card scrap" onclick="game.collect('scrap', 3, event, this)">
         <i class="fas fa-box-open"></i> <span>Hurda Topla (+3)</span>
     </button>
+	
 </div>
                 <div id="tab-structures" class="tab-content hidden">
                     <div class="build-box">

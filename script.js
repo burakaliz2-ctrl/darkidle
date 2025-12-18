@@ -16,6 +16,31 @@ const game = {
         water: false,
         scrap: false
     },
+	achievements: {
+        woodMaster: { name: "Odun Ustası", desc: "1000 odun topla.", goal: 1000, current: 0, done: false, bonus: "Odun toplama +2" },
+        survivor: { name: "Hayatta Kalan", desc: "10 gün hayatta kal.", goal: 10, current: 0, done: false, bonus: "Açlık/Susuzluk %10 yavaşlar" },
+        defender: { name: "Savunma Hattı", desc: "5 baskın püskürt.", goal: 5, current: 0, done: false, bonus: "Savunma gücü +10" }
+    },
+
+    checkAchievements() {
+        // Odun kontrolü
+        if (!this.achievements.woodMaster.done && this.res.wood >= this.achievements.woodMaster.goal) {
+            this.unlockAchievement('woodMaster');
+        }
+        // Gün kontrolü (time / 1440 = geçen gün)
+        const days = Math.floor(this.time / 1440);
+        if (!this.achievements.survivor.done && days >= this.achievements.survivor.goal) {
+            this.unlockAchievement('survivor');
+        }
+    },
+
+    unlockAchievement(id) {
+        this.achievements[id].done = true;
+        this.log(`BAŞARIM KAZANILDI: ${this.achievements[id].name}`, "success");
+        // Bonus etkilerini burada uygula (Örn: prestige artışı veya özel çarpanlar)
+        this.updateUI();
+        this.save();
+    },
     init() {
         this.load();
         this.applyAtmosphere();
@@ -24,38 +49,48 @@ const game = {
         this.log("Sistem Aktif: v5.5 Savunma Hattı Hazır.");
     },
 
-   collect(type, amount, event, element) {
-        // 1. Bu kaynağa özel kilidi kontrol et
-        if (this.cooldowns[type]) return;
+  collect(type, amount, event, element) {
+    // 1. Bu kaynağa özel kilidi kontrol et
+    if (this.cooldowns[type]) return;
 
-        // 2. Kilidi aktifleştir
-        this.cooldowns[type] = true;
-        
-        // 3. Kaynak ekleme ve UI güncelleme
-        const bonusAmount = amount + (this.prestige * 2);
-        this.res[type] += bonusAmount;
-        this.log(`${bonusAmount} ${type} toplandı.`);
-        this.updateUI();
+    // 2. Kilidi aktifleştir
+    this.cooldowns[type] = true;
+    
+    // 3. Kaynak ekleme ve UI güncelleme
+    const bonusAmount = amount + (this.prestige * 2);
+    this.res[type] += bonusAmount;
+    this.log(`${bonusAmount} ${type} toplandı.`);
 
-        // 4. Görsel Efekt ve Tıklama Engelleme
+    // --- KRİTİK DÜZELTME: KEŞİF VE BAŞARIM TETİKLEYİCİSİ ---
+    // Her toplamada %15 şansla bir olay gerçekleşsin
+    if (Math.random() < 0.15) {
+        this.triggerDiscovery();
+    }
+    // Her toplamada başarımları kontrol et
+    this.checkAchievements();
+    // -----------------------------------------------------
+
+    this.updateUI();
+
+    // 4. Görsel Efekt
+    if (element) {
+        element.style.opacity = "0.4";
+        element.style.transform = "scale(0.95)";
+        element.style.borderColor = "var(--neon-red)";
+        element.style.pointerEvents = "none";
+    }
+
+    // 5. 800ms sonra sadece bu kaynağın kilidini aç ve efekti sıfırla
+    setTimeout(() => {
+        this.cooldowns[type] = false;
         if (element) {
-            element.style.opacity = "0.4";
-            element.style.transform = "scale(0.95)";
-            element.style.borderColor = "var(--neon-red)";
-            element.style.pointerEvents = "none"; // Bekleme süresinde tekrar basılmasın
+            element.style.opacity = "1";
+            element.style.transform = "scale(1)";
+            element.style.borderColor = "var(--border-color)";
+            element.style.pointerEvents = "auto";
         }
-
-        // 5. 800ms sonra kilidi aç ve görseli sıfırla
-        setTimeout(() => {
-            this.cooldowns[type] = false;
-            if (element) {
-                element.style.opacity = "1";
-                element.style.transform = "scale(1)";
-                element.style.borderColor = "var(--border-color)";
-                element.style.pointerEvents = "auto"; // Tekrar basılabilir hale getir
-            }
-        }, 800); 
-    },
+    }, 800); 
+},
     triggerDiscovery() {
         const events = [
             { m: "Terk edilmiş bir çanta! (+1 Kit)", f: () => this.inv.medkit++ },
@@ -144,6 +179,20 @@ const game = {
     },
 
     updateUI() {
+		const achList = document.getElementById('achievement-list');
+if (achList) {
+    achList.innerHTML = Object.keys(this.achievements).map(id => {
+        const a = this.achievements[id];
+        return `
+            <div class="ach-card ${a.done ? 'completed' : ''}">
+                <h4>${a.name} ${a.done ? '✅' : ''}</h4>
+                <p>${a.desc}</p>
+                <div class="ach-bonus">Bonus: ${a.bonus}</div>
+            </div>
+        `;
+    }).join('');
+}
+		this.checkAchievements();
         const pTag = document.getElementById('prestige-tag');
         if(pTag) pTag.innerText = `[SEVİYE ${this.prestige}]`;
 
