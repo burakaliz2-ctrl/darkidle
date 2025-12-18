@@ -1,0 +1,184 @@
+:root {
+	--mobile-padding: 12px;
+    --bg-deep: #05080a;
+    --panel-bg: #0d1217;
+    --border-color: #1e293b;
+    --neon-blue: #38bdf8;
+    --neon-green: #10b981;
+    --neon-red: #ef4444;
+    --neon-orange: #f59e0b;
+    --neon-purple: #8b5cf6;
+    --text-main: #f1f5f9;
+    --text-dim: #94a3b8;
+}
+
+* { box-sizing: border-box; transition: background 0.2s, transform 0.1s, box-shadow 0.2s; }
+
+body { 
+    background-color: var(--bg-deep); color: var(--text-main); 
+    font-family: 'Inter', sans-serif; margin: 0; height: 100vh;
+    display: flex; justify-content: center; overflow: hidden;
+	overflow-x: hidden; /* Yan kaymaları engelle */
+}
+
+.weather-overlay { position: fixed; inset: 0; pointer-events: none; z-index: 5; }
+body.night-mode { background-color: #010203; }
+/* Gece Vinyet Efekti */
+body.night-mode::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle, transparent 30%, rgba(0,0,0,0.7) 100%);
+    pointer-events: none;
+    z-index: 999;
+}
+/* Yağmur Efekti Katmanı */
+body.rain-mode::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: url('https://www.transparenttextures.com/patterns/stardust.png'), 
+                linear-gradient(to bottom, rgba(20, 20, 50, 0.1), rgba(0, 0, 0, 0.2));
+    pointer-events: none;
+    z-index: 998;
+    opacity: 0.6;
+    animation: rain-anim 0.2s linear infinite;
+}
+
+@keyframes rain-anim {
+    0% { background-position: 0 0; }
+    100% { background-position: 20px 100px; }
+}
+
+/* Ekranı biraz daha gri/mavi yap */
+body.rain-mode {
+    filter: saturate(0.8) contrast(1.1);
+}
+/* Fırtına Titremesi */
+@keyframes shake {
+    0% { transform: translate(1px, 1px) rotate(0deg); }
+    20% { transform: translate(-1px, -2px) rotate(-1deg); }
+    40% { transform: translate(-3px, 0px) rotate(1deg); }
+    100% { transform: translate(1px, -1px) rotate(0deg); }
+}
+
+body.storm-mode .game-container {
+    animation: shake 0.5s infinite;
+    filter: sepia(0.3) contrast(1.2);
+}
+body.storm-mode .weather-overlay { background: rgba(0, 20, 40, 0.25); box-shadow: inset 0 0 150px rgba(0,0,0,0.7); }
+
+.game-container { width: 100%; max-width: 1400px; padding: 20px; display: flex; flex-direction: column; position: relative; z-index: 10; }
+
+.main-header { text-align: center; margin-bottom: 10px; }
+.main-header h1 { letter-spacing: 4px; color: var(--neon-blue); text-shadow: 0 0 10px rgba(56, 189, 248, 0.4); margin: 0; }
+.header-line { height: 2px; background: linear-gradient(90deg, transparent, var(--neon-blue), transparent); width: 60%; margin: 8px auto; }
+
+.env-bar { display: flex; justify-content: center; gap: 25px; background: rgba(0,0,0,0.5); padding: 8px; border-radius: 4px; margin-bottom: 15px; border: 1px solid var(--border-color); }
+.env-item { display: flex; align-items: center; gap: 8px; color: var(--neon-blue); font-size: 0.85rem; font-family: monospace; }
+.env-warning { color: var(--neon-red); font-size: 0.7rem; font-weight: bold; animation: blink 1s infinite; margin-left: 10px; }
+@keyframes blink { 0%, 100% {opacity:1} 50% {opacity:0.3} }
+
+.resource-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; }
+.res-item { background: var(--panel-bg); padding: 12px; border: 1px solid var(--border-color); border-radius: 4px; display: flex; align-items: center; gap: 12px; border-left: 4px solid var(--border-color); }
+.res-item.wood { border-left-color: var(--neon-orange); }
+.res-item.food { border-left-color: var(--neon-green); }
+.res-item.water { border-left-color: #0ea5e9; }
+.res-item.scrap { border-left-color: #64748b; }
+.res-info strong { font-size: 1.2rem; font-family: monospace; }
+
+.game-grid { display: grid; grid-template-columns: 280px 1fr 300px; gap: 20px; flex-grow: 1; min-height: 0; }
+.side-panel { background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; height: 600px; display: flex; flex-direction: column; }
+
+.panel-header { font-weight: bold; font-size: 0.7rem; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-bottom: 15px; color: var(--text-dim); text-transform: uppercase; }
+
+.bar-wrap { background: #020617; height: 8px; border-radius: 4px; overflow: hidden; border: 1px solid #1e293b; }
+.bar { height: 100%; transition: width 0.3s; }
+.fill-health { background: var(--neon-red); }
+.fill-hunger { background: var(--neon-orange); }
+.fill-thirst { background: #0ea5e9; }
+
+.btn { background: #1e293b; border: 1px solid #334155; color: white; padding: 10px; border-radius: 4px; cursor: pointer; margin-bottom: 8px; font-weight: bold; width: 100%; border: 1px solid #334155; }
+.btn:active { transform: scale(0.96); }
+.btn-consume { background: rgba(16, 185, 129, 0.1); border-color: var(--neon-green); color: var(--neon-green); }
+.btn-consume:hover { background: var(--neon-green); color: black; box-shadow: 0 0 10px var(--neon-green); }
+
+.inventory-box { background: rgba(0,0,0,0.2); padding: 10px; border-radius: 4px; margin-bottom: 10px; border: 1px dashed var(--border-color); }
+.inv-item { display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; }
+.btn-mini { background: var(--neon-red); border: none; color: white; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 0.6rem; font-weight: bold; }
+
+.center-panel { background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 8px; height: 600px; display: flex; flex-direction: column; }
+.tab-nav { display: flex; background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--border-color); }
+.tab-btn { background: none; border: none; color: var(--text-dim); padding: 15px; cursor: pointer; font-weight: bold; flex: 1; }
+.tab-btn.active { color: var(--neon-blue); border-bottom: 2px solid var(--neon-blue); background: rgba(56, 189, 248, 0.05); }
+
+.tab-content { padding: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; overflow-y: auto; align-content: start; }
+.action-card { background: #111827; border: 1px solid var(--border-color); padding: 20px; border-radius: 8px; cursor: pointer; color: white; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.action-card:hover { border-color: var(--neon-blue); transform: translateY(-2px); box-shadow: 0 0 10px rgba(56, 189, 248, 0.2); }
+
+/* YAPILAR ALANI DÜZENİ */
+.build-box { grid-column: span 2; background: #111827; border: 1px solid var(--border-color); padding: 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+.build-text strong { display: block; color: var(--neon-blue); font-size: 0.85rem; }
+.build-text small { color: var(--text-dim); font-size: 0.7rem; }
+.btn-build { width: auto !important; padding: 8px 15px !important; background: var(--neon-blue); color: black; border: none; font-size: 0.7rem; }
+.btn-build:hover { filter: brightness(1.2); box-shadow: 0 0 10px var(--neon-blue); }
+
+.final-repair { grid-column: span 2; text-align: center; border: 1px solid var(--neon-purple); border-radius: 12px; padding: 30px; background: rgba(139, 92, 246, 0.05); }
+.fill-final { background: var(--neon-purple); box-shadow: 0 0 15px var(--neon-purple); }
+
+.btn-final { 
+    background: var(--neon-purple); color: white; border: none; padding: 18px; width: 100%; border-radius: 8px; 
+    font-weight: bold; cursor: pointer; margin-top: 15px; font-size: 1rem; letter-spacing: 1px;
+    box-shadow: 0 4px 0px #5b21b6;
+}
+.btn-final:hover { background: #a78bfa; box-shadow: 0 0 20px rgba(139, 92, 246, 0.4); }
+.btn-final:active { transform: translateY(3px); box-shadow: 0 1px 0px #5b21b6; }
+
+.log-stream { flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; }
+.log-item { padding: 8px; border-left: 2px solid var(--border-color); background: rgba(255,255,255,0.03); font-size: 0.75rem; }
+
+.hidden { display: none !important; }
+
+/* --- SADECE MOBİL UYARLAMASI --- */
+/* Mevcut kodlarının altına olduğu gibi yapıştır */
+
+@media (max-width: 1024px) {
+    body { 
+        height: auto; /* Ekran yüksekliği kilidini aç */
+        overflow-y: auto; /* Kaydırmaya izin ver */
+    }
+
+    .game-container { 
+        height: auto;
+        padding: 10px; 
+    }
+
+    .resource-bar { 
+        grid-template-columns: repeat(2, 1fr); /* Kaynakları 2 satıra böl */
+    }
+
+    .game-grid { 
+        grid-template-columns: 1fr; /* Panelleri (Sol, Orta, Sağ) alt alta diz */
+        height: auto; 
+    }
+
+    .side-panel, .center-panel { 
+        height: auto; /* Sabit 600px'i mobilde iptal et */
+        min-height: 400px; /* Çok küçülmesinler */
+        margin-bottom: 15px;
+    }
+
+    .tab-content { 
+        grid-template-columns: 1fr; /* Butonları mobilde tek sütun yap */
+    }
+
+    .build-box { 
+        flex-direction: column; 
+        text-align: center; 
+        gap: 10px;
+    }
+
+    .btn-build {
+        width: 100% !important; /* İnşa butonlarını mobilde tam genişlik yap */
+    }
+}

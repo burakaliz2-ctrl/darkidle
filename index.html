@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sonsuz Karanlık v5.2</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div id="weather-effect" class="weather-overlay"></div>
+    <div class="game-container">
+        <header class="main-header">
+            <h1><i class="fas fa-radiation"></i> SONSUZ KARANLIK <span id="prestige-tag" style="font-size: 0.5em; color: var(--neon-purple);">[SEVİYE 0]</span></h1>
+			<div class="header-line"></div>
+        </header>
+
+        <section class="env-bar">
+            <div class="env-item"><i id="time-icon" class="fas fa-sun"></i> <span id="game-time">08:00</span></div>
+            <div class="env-item"><i class="fas fa-thermometer-half"></i> <span id="game-temp">22°C</span></div>
+            <div class="env-item"><i class="fas fa-cloud"></i> <span id="weather-text">Açık</span></div>
+            <div id="night-warning" class="env-warning hidden">SOĞUK: Odun yakılıyor...</div>
+        </section>
+
+        <section class="resource-bar">
+            <div class="res-item wood"><i class="fas fa-tree"></i><div class="res-info"><span>Odun: </span><strong id="res-wood">0</strong></div></div>
+            <div class="res-item food"><i class="fas fa-drumstick-bite"></i><div class="res-info"><span>Yemek: </span><strong id="res-food">50</strong></div></div>
+            <div class="res-item water"><i class="fas fa-faucet-drip"></i><div class="res-info"><span>Su: </span><strong id="res-water">50</strong></div></div>
+            <div class="res-item scrap"><i class="fas fa-microchip"></i><div class="res-info"><span>Hurda: </span><strong id="res-scrap">0</strong></div></div>
+        </section>
+
+        <main class="game-grid">
+            <aside class="side-panel">
+                <div class="panel-header"><i class="fas fa-user-heart"></i> Hayatta Kalma</div>
+                <div class="stat-group">
+                    <label>Sağlık <span id="val-health">100</span></label>
+                    <div class="bar-wrap"><div id="bar-health" class="bar fill-health"></div></div>
+                </div>
+                <div class="stat-group">
+                    <label>Açlık <span id="val-hunger">100</span></label>
+                    <div class="bar-wrap"><div id="bar-hunger" class="bar fill-hunger"></div></div>
+                </div>
+                <div class="stat-group">
+                    <label>Susuzluk <span id="val-thirst">100</span></label>
+                    <div class="bar-wrap"><div id="bar-thirst" class="bar fill-thirst"></div></div>
+                </div>
+                
+                <div class="quick-actions">
+                    <button class="btn btn-consume" onclick="game.eat()"><i class="fas fa-utensils"></i> Yemek Ye</button>
+                    <button class="btn btn-consume" onclick="game.drink()"><i class="fas fa-glass-water"></i> Su İç</button>
+                </div>
+
+                <div class="inventory-box">
+                    <div class="panel-header" style="margin-top:10px; font-size:0.6rem;">Envanter</div>
+                    <div class="inv-item">
+                        <span><i class="fas fa-first-aid"></i> Tıbbi Kit: <strong id="inv-medkit">0</strong></span>
+                        <button class="btn-mini" onclick="game.useMedkit()">KULLAN</button>
+                    </div>
+                </div>
+
+                <div class="system-controls">
+                    <button class="btn-sys" onclick="game.save()"><i class="fas fa-save"></i></button>
+                    <button class="btn-sys" onclick="game.load()"><i class="fas fa-download"></i></button>
+                    <button class="btn-sys btn-danger" onclick="game.reset()"><i class="fas fa-trash"></i></button>
+                </div>
+            </aside>
+
+            <section class="center-panel">
+                <nav class="tab-nav">
+                    <button class="tab-btn active" onclick="game.switchTab('actions', event)">EYLEMLER</button>
+                    <button class="tab-btn" onclick="game.switchTab('structures', event)">YAPILAR</button>
+                    <button class="tab-btn" onclick="game.switchTab('final', event)">KURTULUŞ</button>
+                </nav>
+
+                <div id="tab-actions" class="tab-content">
+                    <button class="action-card wood,btn btn-collect" onclick="game.collect('wood', 5)"><i class="fas fa-axe"></i> <span>Odun Kes (+5)</span></button>
+                    <button class="action-card food,btn btn-collect" onclick="game.collect('food', 5)"><i class="fas fa-search"></i> <span>Yiyecek Ara (+5)</span></button>
+                    <button class="action-card water,btn btn-collect" onclick="game.collect('water', 5)"><i class="fas fa-tint"></i> <span>Su Bul (+5)</span></button>
+                    <button class="action-card scrap,btn btn-collect" onclick="game.collect('scrap', 3)"><i class="fas fa-box-open"></i> <span>Hurda Topla (+3)</span></button>
+                </div>
+
+                <div id="tab-structures" class="tab-content hidden">
+                    <div class="build-box">
+                        <div class="build-text"><strong>Oduncu Kampı [Lv <span id="lvl-wood">0</span>]</strong><small id="cost-wood">--</small></div>
+                        <button class="btn btn-build" onclick="game.upgrade('wood')">GELİŞTİR</button>
+                    </div>
+                    <div class="build-box">
+                        <div class="build-text"><strong>Hurda Toplayıcı [Lv <span id="lvl-scrap">0</span>]</strong><small id="cost-scrap">--</small></div>
+                        <button class="btn btn-build" onclick="game.upgrade('scrap')">GELİŞTİR</button>
+                    </div>
+                    <div class="build-box">
+                        <div class="build-text"><strong>Otomatik Mutfak [Lv <span id="lvl-autoEat">0</span>]</strong><small id="cost-autoEat">--</small></div>
+                        <button class="btn btn-build" onclick="game.upgrade('autoEat')">GELİŞTİR</button>
+                    </div>
+                    <div class="build-box">
+                        <div class="build-text"><strong>Su Filtresi [Lv <span id="lvl-autoDrink">0</span>]</strong><small id="cost-autoDrink">--</small></div>
+                        <button class="btn btn-build" onclick="game.upgrade('autoDrink')">GELİŞTİR</button>
+                    </div>
+					<div class="build-box">
+					<div class="build-text"><strong>Savunma Barikatı [Lv <span id="lvl-def">0</span>]</strong><small id="cost-def">--</small></div>
+					<button class="btn btn-build" onclick="game.upgrade('def')">İNŞA ET</button>
+					</div>
+                </div>
+
+                <div id="tab-final" class="tab-content hidden">
+                    <div class="final-repair">
+                        <h3>RADYO KULESİ ONARIMI</h3>
+                        <div class="final-progress-val" id="final-percent">0%</div>
+                        <div class="bar-wrap large"><div id="bar-final" class="bar fill-final"></div></div>
+                        <button class="btn btn-final" onclick="game.repairFinal()"><i class="fas fa-tools"></i> PARÇA EKLE (100 Odun, 100 Hurda)</button>
+                    </div>
+                </div>
+            </section>
+
+            <aside class="side-panel">
+                <div class="panel-header"><i class="fas fa-list-ul"></i> Günlük</div>
+                <div id="log" class="log-stream"></div>
+            </aside>
+        </main>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
